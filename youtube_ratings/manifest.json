@@ -1,0 +1,38 @@
+{
+  "name": "Youtube Ratings",
+  "version": "1.0",
+  "manifest_version": 2,
+  "description": "Preview ratings on youtube videos in the search page.",
+  "browser_action": {
+    "default_icon": "images/icon.png",
+    "default_title": "Youtube Ratings Preview"
+  },
+  "icons": {
+    "16": "images/icon.png",
+    "32": "images/icon.png",
+    "48": "images/icon.png",
+    "128": "images/icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "style.css"
+      ]
+    }
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "tabs",
+    "activeTab"
+  ]
+}
