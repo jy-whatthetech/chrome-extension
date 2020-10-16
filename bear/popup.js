@@ -16,9 +16,9 @@ document.addEventListener(
     // }
 
     const bg = chrome.extension.getBackgroundPage();
-    Object.keys(fbg.bears).forEach(function(url) {
+    Object.keys(bg.bears).forEach(function(url) {
       const div = document.createElement("div");
-      div.textContent = `${url} ${bg.bears[url]} bears`;
+      div.textContent = `${url}: ${bg.bears[url]} bears`;
       document.body.appendChild(div);
     });
   },
