@@ -1,9 +1,9 @@
-window.bears = {};
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  window.bears[request.url] = request.count;
-});
+function doStuffWithDom(resp) {
+  if (resp.dom) {
+    console.log("I received the following DOM content:\n" + resp.dom);
+  }
+}
 
 chrome.browserAction.onClicked.addListener(function(tab) {
-  console.log("Browser action was clicked");
-  chrome.tabs.create({ url: "popup.html" });
+  chrome.tabs.sendMessage(tab.id, { text: "report_back" }, doStuffWithDom);
 });
