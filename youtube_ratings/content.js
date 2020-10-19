@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 
     if (1 === 1) {
       const xhr = new XMLHttpRequest();
-      let youtubeAPIKey = "AIzaSyA3ye42GDk4SfBRNwsgrOscNmwxS0kr7Ao";
+      let youtubeAPIKey = "<test_api_key>"; // read this from config file
 
       xhr.open(
         "GET",
