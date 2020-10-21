@@ -1,4 +1,5 @@
-window.strayDivIds = [];
+let strayDivIds = [];
+const youtubeBaseUrl = "https://www.googleapis.com/youtube/v3/";
 
 function convertHrefSetToStrings(hrefs) {
   const res = [];
@@ -26,13 +27,13 @@ function convertHrefSetToStrings(hrefs) {
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
     // perform cleanup
-    for (let strayDivId of window.strayDivIds) {
+    for (let strayDivId of strayDivIds) {
       const strayDiv = document.getElementById(strayDivId);
       if (strayDiv) {
         strayDiv.remove();
       }
     }
-    window.strayDivIds = [];
+    strayDivIds = [];
 
     const anchors = document.getElementsByTagName("a");
     const hrefs = new Set();
@@ -67,17 +68,27 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
     let youtubeAPIKey = config.youtubeAPIKey; // read this from config file
     const hrefStrings = convertHrefSetToStrings(hrefs);
 
+    // get the top comments for this video
+    // TODO: fetch this on tooltip hover
+    const xhr = new XMLHttpRequest();
+    xhr.open(
+      "GET",
+      youtubeBaseUrl +
+        `commentThreads?key=${youtubeAPIKey}&part=id,snippet&maxResults=100&textFormat=plainText&videoId=${hrefString}`,
+      true
+    );
+
     for (let hrefString of hrefStrings) {
       const xhr = new XMLHttpRequest();
       xhr.open(
         "GET",
-        `https://www.googleapis.com/youtube/v3/videos?key=${youtubeAPIKey}&part=snippet,contentDetails,statistics&id=${hrefString}`,
+        youtubeBaseUrl +
+          `videos?key=${youtubeAPIKey}&part=snippet,contentDetails,statistics&id=${hrefString}`,
         true
       );
       xhr.onreadystatechange = () => {
         if (xhr.readyState == 4) {
           const response = JSON.parse(xhr.responseText);
-          debugger;
           response.items.forEach(function(item) {
             // console.log(item.id);
             console.log("-------------------------------");
@@ -98,6 +109,8 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
               if (likes + dislikes > 0) {
                 likePercentage = Math.round((likes / (likes + dislikes)) * 100);
               }
+
+              // print out aggregated info
               console.log(
                 `likes: ${likes} dislikes: ${dislikes}  Like Percentage: ${likePercentage}`
               );
@@ -105,7 +118,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
               // decorate the divs with the ratings info
               const div = document.createElement("div");
               div.id = item.id;
-              window.strayDivIds.push(div.id);
+              strayDivIds.push(div.id);
 
               div.style.position = "absolute";
               div.style.padding = "3px";
