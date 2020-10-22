@@ -48,18 +48,15 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
           end = link.indexOf("&t=");
         }
 
-        // TODO: create a regex that can filter out invalid filters. There may be other request parameters other than time
-        // if (link.indexOf("&", start) !== -1) {
-        //   end = link.indexOf("&", start);
-        // }
-
         const videoId = link.slice(start, end);
 
-        if (!hrefs.has(videoId)) {
+        const parentDiv = anchor.closest("div");
+        if (parentDiv.id === "dismissable") {
+          console.log(parentDiv);
+          if (hrefs.has(videoId)) {
+            console.log("REPEAT?");
+          }
           hrefs.add(videoId);
-
-          // map videoId to closest parent div
-          const parentDiv = anchor.closest("div");
           idToParentDiv[videoId] = parentDiv;
         }
       }
@@ -70,89 +67,97 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 
     // get the top comments for this video
     // TODO: fetch this on tooltip hover
-    const xhr = new XMLHttpRequest();
-    xhr.open(
-      "GET",
-      youtubeBaseUrl +
-        `commentThreads?key=${youtubeAPIKey}&part=id,snippet&maxResults=100&textFormat=plainText&videoId=${hrefString}`,
-      true
-    );
+    // const xhr = new XMLHttpRequest();
+    // xhr.open(
+    //   "GET",
+    //   youtubeBaseUrl +
+    //     `commentThreads?key=${youtubeAPIKey}&part=id,snippet&maxResults=100&textFormat=plainText&videoId=${hrefString}`,
+    //   true
+    // );
 
-    for (let hrefString of hrefStrings) {
-      const xhr = new XMLHttpRequest();
-      xhr.open(
-        "GET",
-        youtubeBaseUrl +
-          `videos?key=${youtubeAPIKey}&part=snippet,contentDetails,statistics&id=${hrefString}`,
-        true
-      );
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState == 4) {
-          const response = JSON.parse(xhr.responseText);
-          response.items.forEach(function(item) {
-            // console.log(item.id);
-            console.log("-------------------------------");
-            if (item.snippet) {
-              console.log(item.snippet.title);
-            }
-            if (item.statistics) {
-              const likes = parseInt(item.statistics.likeCount);
-              const dislikes = parseInt(item.statistics.dislikeCount);
-
-              // comment count of -1 means comments disabled
-              let commentCnt = parseInt(item.statistics.commentCount);
-              if (isNaN(commentCnt)) {
-                commentCnt = -1;
+    console.log("HOW MANY LINKS?");
+    console.log(hrefs.size);
+    let x = 2;
+    if (x === 1) {
+      for (let hrefString of hrefStrings) {
+        const xhr = new XMLHttpRequest();
+        xhr.open(
+          "GET",
+          youtubeBaseUrl +
+            `videos?key=${youtubeAPIKey}&part=snippet,contentDetails,statistics&id=${hrefString}`,
+          true
+        );
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState == 4) {
+            const response = JSON.parse(xhr.responseText);
+            response.items.forEach(function(item) {
+              // console.log(item.id);
+              console.log("-------------------------------");
+              if (item.snippet) {
+                console.log(item.snippet.title);
               }
+              if (item.statistics) {
+                const likes = parseInt(item.statistics.likeCount);
+                const dislikes = parseInt(item.statistics.dislikeCount);
 
-              let likePercentage = 100;
-              if (likes + dislikes > 0) {
-                likePercentage = Math.round((likes / (likes + dislikes)) * 100);
+                // comment count of -1 means comments disabled
+                let commentCnt = parseInt(item.statistics.commentCount);
+                if (isNaN(commentCnt)) {
+                  commentCnt = -1;
+                }
+
+                let likePercentage = 100;
+                if (likes + dislikes > 0) {
+                  likePercentage = Math.round(
+                    (likes / (likes + dislikes)) * 100
+                  );
+                }
+
+                // print out aggregated info
+                console.log(
+                  `likes: ${likes} dislikes: ${dislikes}  Like Percentage: ${likePercentage}`
+                );
+
+                // decorate the divs with the ratings info
+                const div = document.createElement("div");
+                div.id = item.id;
+                strayDivIds.push(div.id);
+
+                div.style.position = "absolute";
+                div.style.padding = "3px";
+                div.style.background = "green";
+                div.style.color = "white";
+
+                if (likePercentage < 60) {
+                  div.style.background = "red";
+                } else if (likePercentage < 90) {
+                  div.style.background = "yellow";
+                  div.style.color = "black";
+                }
+
+                // TODO: map the videoIds to the relevant information, then loops through divs
+                div.textContent = `${likes} \\ ${likePercentage}% \\ ${
+                  commentCnt == -1 ? "Comments Disabled" : commentCnt
+                }`;
+
+                div.onmouseover = function() {
+                  div.title = "HELLO WORLD!!!";
+                };
+
+                const parentDiv = idToParentDiv[item.id];
+                if (parentDiv) {
+                  parentDiv.appendChild(div);
+                }
               }
-
-              // print out aggregated info
-              console.log(
-                `likes: ${likes} dislikes: ${dislikes}  Like Percentage: ${likePercentage}`
-              );
-
-              // decorate the divs with the ratings info
-              const div = document.createElement("div");
-              div.id = item.id;
-              strayDivIds.push(div.id);
-
-              div.style.position = "absolute";
-              div.style.padding = "3px";
-              div.style.background = "green";
-              div.style.color = "white";
-
-              if (likePercentage < 60) {
-                div.style.background = "red";
-              } else if (likePercentage < 90) {
-                div.style.background = "yellow";
-                div.style.color = "black";
-              }
-
-              div.textContent = `${likes} \\ ${likePercentage}% \\ ${
-                commentCnt == -1 ? "Comments Disabled" : commentCnt
-              }`;
-
-              div.onmouseover = function() {
-                div.title = "HELLO WORLD!!!";
-              };
-
-              const parentDiv = idToParentDiv[item.id];
-              if (parentDiv) {
-                parentDiv.appendChild(div);
-              }
-            }
-          });
-        } else {
-          console.log(
-            `The XMLHttpRequest readyState changed to ${xhr.readyState}`
-          );
-        }
-      };
-      xhr.send();
+            });
+          } else {
+            console.log(
+              `The XMLHttpRequest readyState changed to ${xhr.readyState}`
+            );
+          }
+        };
+        xhr.send();
+      }
     }
 
     sendResponse({ dom: document });
