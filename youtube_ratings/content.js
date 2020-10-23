@@ -3,6 +3,7 @@ const youtubeAPIKey = config.youtubeAPIKey; // read this from config file
 let videoIdToDivs = {}; // map of video ids to the divs that link to this video
 let strayDivIds = [];
 let videoInformation = {}; // map of video id to info object
+let videoIdToComments = {};
 
 function performCleanup() {
   for (let divId of strayDivIds) {
@@ -14,6 +15,7 @@ function performCleanup() {
   strayDivIds = [];
   videoIdToDivs = {};
   videoInformation = {};
+  videoIdToComments = {};
 }
 
 // given a list of videoIds, return a list of compacted (comma-separated) strings
@@ -66,8 +68,11 @@ async function processVideosList(videoIdsString) {
       if (xhr.readyState == 4) {
         const response = JSON.parse(xhr.responseText);
         if (!response.items) {
-          console.error(`Error: the response does not have 'items' property`);
+          console.error(
+            `Error: the videos response does not have 'items' property`
+          );
           console.log(response);
+          reject(response);
         }
 
         // loop through items and parse the information
@@ -111,6 +116,97 @@ async function processVideosList(videoIdsString) {
   });
 }
 
+// make comments API request to get top comments
+function getCommentsForVideo(videoId, commentCount) {
+  return new Promise((resolve, reject) => {
+    if (commentCount <= 0) {
+      resolve("");
+    }
+    if (videoIdToComments[videoId]) {
+      resolve(videoIdToComments[videoId]);
+    }
+
+    // get # of pages to fetch
+    const pagesToFetch =
+      commentCount > 1000 ? 10 : Math.floor((commentCount - 1) / 100) + 1;
+
+    const commentsList = [];
+    const request = new XMLHttpRequest();
+
+    // recursive function that runs until pagesToFetch is reached or no more comments
+    (function loop(i, nextPageToken) {
+      if (i > pagesToFetch || (i > 1 && !nextPageToken)) {
+        commentsList.sort((a, b) => {
+          return b.likes - a.likes;
+        });
+
+        let tooltipText = "";
+        for (let x = 0; x < 3; x++) {
+          if (x >= commentsList.length) break;
+          if (x > 0) {
+            tooltipText += "\r\n\r\n";
+          }
+          tooltipText +=
+            "+" +
+            commentsList[x].likes +
+            "\r\n" +
+            commentsList[x].author +
+            "\r\n" +
+            commentsList[x].text;
+        }
+
+        videoIdToComments[videoId] = tooltipText;
+        resolve(tooltipText);
+        return;
+      }
+
+      const nextPageSuffix = i > 1 ? `&pageToken=${nextPageToken}` : "";
+      const url =
+        youtubeBaseUrl +
+        `commentThreads?key=${youtubeAPIKey}&part=id,snippet&videoId=${videoId}&maxResults=100&textFormat=plainText${nextPageSuffix}`;
+
+      request.open("GET", url);
+      request.onreadystatechange = function() {
+        if (request.readyState === XMLHttpRequest.DONE) {
+          // some error checking
+          if (request.status !== 200) {
+            reject("error: the request status return " + request.status);
+            return;
+          }
+          const response = JSON.parse(request.responseText);
+          if (!response.items) {
+            console.error(`Error: the response does not have 'items' property`);
+            console.log(response);
+            reject(response);
+            return;
+          }
+
+          // accumulate comment text and likes
+          response.items.forEach(function(item) {
+            if (item.snippet.topLevelComment) {
+              const comment = item.snippet.topLevelComment.snippet;
+              commentsList.push({
+                likes: comment.likeCount,
+                author: comment.authorDisplayName,
+                text: comment.textDisplay
+              });
+            }
+          });
+
+          // recursively call the next page
+          loop(i + 1, response.nextPageToken);
+        } else {
+          console.log(
+            `The XMLHttpRequest readyState for commentThreads changed to ${request.readyState}`
+          );
+        }
+      };
+
+      request.send();
+    })(1, "");
+  });
+}
+
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
     performCleanup();
@@ -130,16 +226,6 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
       }
       videoIdToDivs[videoId].push(parentDiv);
     }
-
-    // get the top comments for this video
-    // TODO: fetch this on tooltip hover
-    // const xhr = new XMLHttpRequest();
-    // xhr.open(
-    //   "GET",
-    //   youtubeBaseUrl +
-    //     `commentThreads?key=${youtubeAPIKey}&part=id,snippet&maxResults=100&textFormat=plainText&videoId=${hrefString}`,
-    //   true
-    // );
 
     const compactedVideoIdList = getPaginatedVideoIds(
       Object.keys(videoIdToDivs)
@@ -164,6 +250,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           div.style.position = "absolute";
           div.style.padding = "3px";
 
+          // TODO: set the background color to white if no likes/dislikes
           // set the background color based on like percentage
           div.style.background = "green";
           div.style.color = "white";
@@ -183,9 +270,13 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
               : videoInfo.commentCount
           }`;
 
-          // TODO: test tooltip
           div.onmouseover = function() {
-            div.title = "HELLO WORLD!!!";
+            getCommentsForVideo(videoId, videoInfo.commentCount).then(
+              response => {
+                // TODO: make this into a popup element, show loading indicator when loading comments
+                div.title = response;
+              }
+            );
           };
         }
       }
