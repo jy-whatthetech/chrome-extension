@@ -209,6 +209,9 @@ function getCommentsForVideo(videoId, commentCount) {
 
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
+    // return the dom back to backgrounds.js
+    sendResponse({ dom: document });
+
     performCleanup();
 
     const anchors = document.getElementsByTagName("a");
@@ -242,6 +245,13 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
         for (let parentDiv of videoIdToDivs[videoId]) {
           const videoInfo = videoInformation[videoId];
 
+          // remove videos with < 60% like percentage
+          // TODO: turn this into a slider option?
+          // if (videoInfo.likePercentage < 0) {
+          //   parentDiv.remove();
+          //   continue;
+          // }
+
           const div = document.createElement("div");
           div.id = videoId;
           strayDivIds.push(div.id);
@@ -271,19 +281,24 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           }`;
 
           div.onmouseover = function() {
-            getCommentsForVideo(videoId, videoInfo.commentCount).then(
-              response => {
-                // TODO: make this into a popup element, show loading indicator when loading comments
-                div.title = response;
+            // getCommentsForVideo(videoId, videoInfo.commentCount).then(
+            //   response => {
+            //     // TODO: make this into a popup element, show loading indicator when loading comments
+            //     div.title = response;
+            //   }
+            // );
+            const idSelector = "#" + div.id;
+            $(idSelector).tooltip({
+              content: "... waiting on ajax ...",
+              open: function(evt, ui) {
+                var elem = $(this);
+                elem.tooltip("option", "content", "Ajax call complete");
               }
-            );
+            });
           };
         }
       }
     }
-
-    // return the dom back to backgrounds.js
-    sendResponse({ dom: document });
   }
 
   sendResponse({
