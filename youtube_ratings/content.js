@@ -286,9 +286,9 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           }`;
 
           div.onmouseover = function() {
+            div.title = "Loading comments...";
             getCommentsForVideo(videoId, videoInfo.commentCount).then(
               response => {
-                // TODO: make this into a popup element, show loading indicator when loading comments
                 div.title = response;
               }
             );

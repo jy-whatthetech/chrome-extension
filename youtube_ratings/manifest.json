@@ -5,7 +5,8 @@
   "description": "Preview ratings on youtube videos in the search page.",
   "browser_action": {
     "default_icon": "images/icon.jpg",
-    "default_title": "Youtube Ratings Preview"
+    "default_title": "Youtube Ratings Preview",
+    "default_popup": "popup.html"
   },
   "icons": {
     "16": "images/icon.jpg",
@@ -43,8 +44,15 @@
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Opens filter toolbar"
+    },
+    "toggle-feature": {
+      "suggested_key": {
         "default": "Ctrl+Shift+Q",
-        "mac": "MacCtrl+Shift+Q"
+        "mac": "Command+Shift+Q"
       },
       "description": "Generates Ratings Preview"
     }
