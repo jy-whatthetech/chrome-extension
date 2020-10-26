@@ -212,6 +212,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     // return the dom back to backgrounds.js
     sendResponse({ dom: document });
 
+    // cleanup state variables
     performCleanup();
 
     const anchors = document.getElementsByTagName("a");
@@ -246,11 +247,11 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           const videoInfo = videoInformation[videoId];
 
           // remove videos with < 60% like percentage
-          // TODO: turn this into a slider option?
-          // if (videoInfo.likePercentage < 0) {
-          //   parentDiv.remove();
-          //   continue;
-          // }
+          // TODO: TURN THIS INTO A SLIDER OPTION
+          if (videoInfo.likePercentage < 0) {
+            parentDiv.remove();
+            continue;
+          }
 
           const div = document.createElement("div");
           div.id = videoId;
@@ -260,15 +261,19 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           div.style.position = "absolute";
           div.style.padding = "3px";
 
-          // TODO: set the background color to white if no likes/dislikes
           // set the background color based on like percentage
-          div.style.background = "green";
-          div.style.color = "white";
-          if (videoInfo.likePercentage < 60) {
-            div.style.background = "red";
-          } else if (videoInfo.likePercentage < 90) {
-            div.style.background = "yellow";
+          if (videoInfo.likes + videoInfo.dislikes === 0) {
             div.style.color = "black";
+            div.style.background = "white";
+          } else if (videoInfo.likePercentage >= 90) {
+            div.style.color = "white";
+            div.style.background = "green";
+          } else if (videoInfo.likePercentage >= 60) {
+            div.style.color = "black";
+            div.style.background = "yellow";
+          } else {
+            div.style.color = "white";
+            div.style.background = "red";
           }
 
           // set the info on the div
@@ -281,20 +286,12 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           }`;
 
           div.onmouseover = function() {
-            // getCommentsForVideo(videoId, videoInfo.commentCount).then(
-            //   response => {
-            //     // TODO: make this into a popup element, show loading indicator when loading comments
-            //     div.title = response;
-            //   }
-            // );
-            const idSelector = "#" + div.id;
-            $(idSelector).tooltip({
-              content: "... waiting on ajax ...",
-              open: function(evt, ui) {
-                var elem = $(this);
-                elem.tooltip("option", "content", "Ajax call complete");
+            getCommentsForVideo(videoId, videoInfo.commentCount).then(
+              response => {
+                // TODO: make this into a popup element, show loading indicator when loading comments
+                div.title = response;
               }
-            });
+            );
           };
         }
       }
