@@ -1,11 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset='UTF-8'>
+  <head>
+    <meta charset="UTF-8" />
     <title>Document</title>
-</head>
-<body>
-    <!-- <button>Count Bears</button> -->
-    <script src="popup.js" charset="utf-8"></script>
-</body>
+    <style>
+      .box {
+        display: flex;
+        width: 250px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .slider-label {
+        text-align: center;
+        margin-bottom: 3px;
+      }
+      #slider {
+        width: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h3 class="slider-label">
+        Number of comments to display:
+      </h3>
+      <div>
+        <input id="slider" type="range" min="1" max="10" value="3" step="1" />
+        <div>sample</div>
+      </div>
+      <h3 class="slider-label">
+        Filter out videos below Like %:
+      </h3>
+      <input
+        id="slider"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        step="1"
+      /><span>sample</span>
+      <script src="popup.js"></script>
+    </div>
+  </body>
 </html>
