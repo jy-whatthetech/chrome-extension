@@ -5,6 +5,20 @@ let strayDivIds = [];
 let videoInformation = {}; // map of video id to info object
 let videoIdToComments = {};
 
+let commentsToDisplay = 3;
+let ratingsToFilter = 0;
+
+// TODO: Don't remove for now, so the options get persisted across browser refresh
+// chrome.storage.local.remove(
+//   ["commentsToDisplay", "ratingsToFilter"],
+//   function() {
+//     var error = chrome.runtime.lastError;
+//     if (error) {
+//       console.error(error);
+//     }
+//   }
+// );
+
 function performCleanup() {
   for (let divId of strayDivIds) {
     const strayDiv = document.getElementById(divId);
@@ -16,6 +30,15 @@ function performCleanup() {
   videoIdToDivs = {};
   videoInformation = {};
   videoIdToComments = {};
+
+  chrome.storage.local.get(["commentsToDisplay", "ratingsToFilter"], function(
+    result
+  ) {
+    if (result.commentsToDisplay)
+      commentsToDisplay = parseInt(result.commentsToDisplay);
+    if (result.ratingsToFilter)
+      ratingsToFilter = parseInt(result.ratingsToFilter);
+  });
 }
 
 // given a list of videoIds, return a list of compacted (comma-separated) strings
@@ -141,9 +164,6 @@ function getCommentsForVideo(videoId, commentCount) {
         });
 
         let tooltipText = "";
-        const commentsToDisplay = window.commentsToDisplay
-          ? window.commentsToDisplay
-          : 3;
         for (let x = 0; x < commentsToDisplay; x++) {
           if (x >= commentsList.length) break;
           if (x > 0) {
@@ -250,8 +270,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
           const videoInfo = videoInformation[videoId];
 
           // remove videos with < 60% like percentage
-          // TODO: TURN THIS INTO A SLIDER OPTION
-          if (videoInfo.likePercentage < 0) {
+          if (videoInfo.likePercentage < ratingsToFilter) {
             parentDiv.remove();
             continue;
           }
