@@ -1,18 +1,18 @@
 {
-  "name": "James' Chrome Extension",
+  "name": "Youtube Preview",
   "version": "1.0",
   "manifest_version": 2,
-  "description": "Preview ratings on youtube videos in the search page.",
+  "description": "Preview ratings and top-voted comments on youtube videos in the search page.",
   "browser_action": {
-    "default_icon": "images/icon.jpg",
+    "default_icon": "images/icon.png",
     "default_title": "Youtube Ratings Preview",
     "default_popup": "popup.html"
   },
   "icons": {
-    "16": "images/icon.jpg",
-    "32": "images/icon.jpg",
-    "48": "images/icon.jpg",
-    "128": "images/icon.jpg"
+    "16": "images/icon.png",
+    "32": "images/icon.png",
+    "48": "images/icon.png",
+    "128": "images/icon.png"
   },
   "content_scripts": [
     {
