@@ -141,7 +141,10 @@ function getCommentsForVideo(videoId, commentCount) {
         });
 
         let tooltipText = "";
-        for (let x = 0; x < 3; x++) {
+        const commentsToDisplay = window.commentsToDisplay
+          ? window.commentsToDisplay
+          : 3;
+        for (let x = 0; x < commentsToDisplay; x++) {
           if (x >= commentsList.length) break;
           if (x > 0) {
             tooltipText += "\r\n\r\n";

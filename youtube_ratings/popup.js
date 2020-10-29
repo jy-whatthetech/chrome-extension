@@ -1,26 +1,25 @@
-document.addEventListener(
-  "DOMContentLoaded",
-  function() {
-    // document.querySelector("button").addEventListener("click", onclick, false);
+document.addEventListener("DOMContentLoaded", documentEvents, false);
 
-    // function onclick() {
-    //   chrome.tabs.query({ currentWindow: true, active: true }, function(tabs) {
-    //     chrome.tabs.sendMessage(tabs[0].id, "hi", setCount);
-    //   });
-    // }
+function documentEvents() {
+  document
+    .getElementById("commentsSlider")
+    .addEventListener("input", function() {
+      const val = document.getElementById("commentsSlider").value;
+      window.commentsToDisplay = val;
 
-    // function setCount(res) {
-    //     const div = document.createElement('div')
-    //     div.textContent = `${res.count} bears`
-    //     document.body.appendChild(div)
-    // }
+      document.getElementById(
+        "commentsLabel"
+      ).innerText = `Number of comments to display: ${val}`;
+    });
 
-    // const bg = chrome.extension.getBackgroundPage();
-    // Object.keys(bg.bears).forEach(function(url) {
-    //   const div = document.createElement("div");
-    //   div.textContent = `${url}: ${bg.bears[url]} bears`;
-    //   document.body.appendChild(div);
-    // });
-  },
-  false
-);
+  document
+    .getElementById("ratingsSlider")
+    .addEventListener("input", function() {
+      const val = document.getElementById("ratingsSlider").value;
+      window.ratingsToFilter = val;
+
+      document.getElementById(
+        "ratingsLabel"
+      ).innerText = `Filter out videos below: ${val}%`;
+    });
+}
