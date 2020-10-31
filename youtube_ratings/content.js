@@ -19,6 +19,7 @@ let ratingsToFilter = 0;
 //   }
 // );
 
+// remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
 function performCleanup() {
   for (let divId of strayDivIds) {
     const strayDiv = document.getElementById(divId);
@@ -70,11 +71,12 @@ function getPaginatedVideoIds(videoIds) {
 // takes href string and returns videoId
 function stripLink(link) {
   if (link.indexOf("?v=") === -1) return null;
+  const start = link.indexOf("?v=") + 3;
   let end = link.length;
-  if (link.indexOf("&t=") !== -1) {
-    end = link.indexOf("&t=");
+  if (link.indexOf("&", start) !== -1) {
+    end = link.indexOf("&");
   }
-  return link.slice(link.indexOf("?v=") + 3, end);
+  return link.slice(start, end);
 }
 
 // makes the API call and does the processing of server call response
@@ -268,6 +270,9 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
       for (let videoId of Object.keys(videoIdToDivs)) {
         for (let parentDiv of videoIdToDivs[videoId]) {
           const videoInfo = videoInformation[videoId];
+          if (!videoInfo) {
+            continue;
+          }
 
           // remove videos with < 60% like percentage
           if (videoInfo.likePercentage < ratingsToFilter) {
