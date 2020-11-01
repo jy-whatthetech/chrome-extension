@@ -123,11 +123,11 @@ async function processVideosList(videoIdsString) {
           };
 
           // print out aggregated info
-          console.log("-------------------------------");
-          console.log(item.snippet.title);
-          console.log(
-            `likes: ${likes} dislikes: ${dislikes}  Like Percentage: ${likePercentage}`
-          );
+          // console.log("-------------------------------");
+          // console.log(item.snippet.title);
+          // console.log(
+          //   `likes: ${likes} dislikes: ${dislikes}  Like Percentage: ${likePercentage}`
+          // );
 
           resolve(videoInformation);
         });
@@ -159,6 +159,7 @@ function getCommentsForVideo(videoId, commentCount) {
     const request = new XMLHttpRequest();
 
     // recursive function that runs until pagesToFetch is reached or no more comments
+    console.log("COMMENTS TO DISPLAY: " + commentsToDisplay);
     (function loop(i, nextPageToken) {
       if (i > pagesToFetch || (i > 1 && !nextPageToken)) {
         commentsList.sort((a, b) => {
