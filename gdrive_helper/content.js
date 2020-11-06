@@ -19,6 +19,18 @@ let ratingsToFilter = 0;
 //   }
 // );
 
+function copyFile() {
+
+}
+
+function gatherLinks() {
+
+}
+
+function generateNames() {
+  
+}
+
 // remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
 function performCleanup() {
   for (let divId of strayDivIds) {
