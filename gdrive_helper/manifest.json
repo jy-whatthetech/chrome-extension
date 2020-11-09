@@ -38,21 +38,35 @@
     "https://ajax.googleapis.com/",
     "contentSettings",
     "identity",
+    "identity.email",
     "https://www.googleapis.com/*"
   ],
+  "oauth2": {
+    "client_id": "655908127991-v887pv40cke4lhq044s5lobl9q63889k.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/drive",
+      "https://www.googleapis.com/auth/drive.appdata",
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/drive.metadata",
+      "https://www.googleapis.com/auth/drive.metadata.readonly",
+      "https://www.googleapis.com/auth/drive.photos.readonly",
+      "https://www.googleapis.com/auth/drive.readonly"
+    ]
+  },
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA835JZHgLuUGAFEH2QwVG/fpwZAxb4KE5a5LCVesdCnhKiFK4DrFXHy4ETuMe0Ukxy5f//Qde9s5s8lzgbEitpmtIoHIKI0mN+pTYDlg5ow/y4bA1O4j3y5mUYvQJSoJHDMgkgXtoDa9uUM3YmNW0ZuwQKbPxK17z2U5hqiaWHNXxc2MF70fj161qmPHigW7fk7NxV7cWiKEiBGM0qsndHxt6iCAEhWookVch11m4zITRdJSpTi6PJ3j1bpUM0i/nHpkNkXNgiEjhBQAGCAo/vs7m6ov2D3dbw23sLjtLuBYtVDasgdIw2d0XOlY6DGukpsLGymJ1vkKsOI+bS6FUBQIDAQAB",
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Y",
-        "mac": "Command+Shift+Y"
+        "default": "Ctrl+Shift+E",
+        "mac": "Command+Shift+E"
       },
       "description": "Opens filter toolbar"
     },
     "toggle-feature": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Q",
-        "mac": "Command+Shift+Q"
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
       },
       "description": "Generates Ratings Preview"
     }

@@ -29,3 +29,7 @@ chrome.commands.onCommand.addListener(function(command) {
     );
   }
 });
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse)=> {
+
+});
