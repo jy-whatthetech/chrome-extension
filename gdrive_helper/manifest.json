@@ -28,6 +28,7 @@
   "background": {
     "persistent": false,
     "scripts": [
+      "config.js",
       "background.js"
     ]
   },
