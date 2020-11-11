@@ -1,5 +1,9 @@
 const API_KEY = config.driveAPIKey; // read this from config file
 
+const DRIVE_BASEURL = "https://www.googleapis.com/drive/v3/";
+
+const FILES_API_URL = `${DRIVE_BASEURL}files?key=${API_KEY}&corpora=user&includeItemsFromAllDrives=true&supportsAllDrives=true&pageSize=1000`;
+
 function doStuffWithDom(resp) {
   if (resp.dom) {
     console.log("I received the following DOM content:\n" + resp.dom);
@@ -20,14 +24,13 @@ chrome.commands.onCommand.addListener(function(command) {
     console.log("AUTH TOKEN OBTAINED");
     console.log(token);
 
-    let fetch_url = `https://www.googleapis.com/drive/v3/drives?useDomainAdminAccess=false&key=${API_KEY}`;
     let fetch_options = {
       headers: {
         Authorization: `Bearer ${token}`
       }
     };
 
-    fetch(fetch_url, fetch_options)
+    fetch(FILES_API_URL, fetch_options)
       .then(res => res.json())
       .then(res => {
         console.log("RESULTS RETRIEVED:");
