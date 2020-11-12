@@ -11,6 +11,24 @@ async function getAllFiles(fetchOptions, pageSize) {
   return result;
 }
 
+async function copyFile(authToken, fileId, name) {
+  let copy_file_url = `${DRIVE_BASEURL}files/${fileId}/copy?key=${API_KEY}&supportsAllDrives=true&fields=*&alt=json`;
+  const data = {
+    name: name
+  };
+  const fetchOptions = {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  };
+  const response = await fetch(copy_file_url, fetchOptions);
+  const result = await response.json();
+  return result;
+}
+
 // remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
 function performCleanup() {
   // TODO:
@@ -19,6 +37,7 @@ function performCleanup() {
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
     const fetchOptions = msg.fetchOptions;
+    const authToken = msg.authToken;
 
     // cleanup state variables
     performCleanup();
@@ -55,6 +74,15 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
     console.log("ARRAY IS:");
     console.log(selectedIds); // Get the last one, sometimes previous pages' selections are also stored?
+
+    const selectedFileId = selectedIds[selectedIds.length - 1];
+    const copyResult = await copyFile(
+      authToken,
+      selectedFileId,
+      "COPY_BRBRBRBRRBR"
+    );
+    console.log("COPY RESULT:");
+    console.log(copyResult);
 
     let test123 = 1;
     if (test123 === 1) {

@@ -35,7 +35,11 @@ chrome.commands.onCommand.addListener(function(command) {
           const tab = tabs[0];
           chrome.tabs.sendMessage(
             tab.id,
-            { text: "report_back", fetchOptions: fetchOptions },
+            {
+              text: "report_back",
+              fetchOptions: fetchOptions,
+              authToken: token
+            },
             doStuffWithDom
           );
         });
