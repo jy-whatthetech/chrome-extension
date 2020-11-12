@@ -1,5 +1,8 @@
-const youtubeBaseUrl = "https://www.googleapis.com/youtube/v3/";
-const youtubeAPIKey = config.youtubeAPIKey; // read this from config file
+const API_KEY = config.driveAPIKey; // read this from config file
+const DRIVE_BASEURL = "https://www.googleapis.com/drive/v3/";
+
+const FILES_API_URL = `${DRIVE_BASEURL}files?key=${API_KEY}&corpora=user&includeItemsFromAllDrives=true&supportsAllDrives=true&pageSize=1000`;
+
 let videoIdToDivs = {}; // map of video ids to the divs that link to this video
 let strayDivIds = [];
 let videoInformation = {}; // map of video id to info object
@@ -19,17 +22,11 @@ let ratingsToFilter = 0;
 //   }
 // );
 
-function copyFile() {
+function copyFile() {}
 
-}
+function gatherLinks() {}
 
-function gatherLinks() {
-
-}
-
-function generateNames() {
-  
-}
+function generateNames() {}
 
 // remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
 function performCleanup() {
@@ -249,6 +246,49 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
     // return the dom back to backgrounds.js
     sendResponse({ dom: document });
+
+    let selectedIds = [];
+    // filter out divs with data-tile-entry-id
+    const divs = document.getElementsByTagName("div");
+    for (let div of divs) {
+      let fileId = "";
+      if (div.hasAttribute("data-tile-entry-id")) {
+        const tabindex = div.getAttribute("tabindex");
+        if (tabindex === "0") {
+          fileId = div.getAttribute("data-tile-entry-id");
+        }
+      } else if (div.hasAttribute("data-id")) {
+        const childDivs = div.querySelectorAll("div");
+        for (let childDiv of childDivs) {
+          if (
+            childDiv.hasAttribute("aria-selected") &&
+            childDiv.getAttribute("aria-selected") === "true"
+          ) {
+            fileId = div.getAttribute("data-id");
+            break;
+          }
+        }
+      }
+      if (fileId.length > 0) {
+        selectedIds.push(fileId);
+      }
+    }
+
+    console.log("ARRAY IS:");
+    console.log(selectedIds);
+
+    // const fetchOptions = msg.fetchOptions;
+    // fetch(FILES_API_URL, fetchOptions)
+    //   .then(res => res.json())
+    //   .then(res => {
+    //     console.log("RESULTS RETRIEVED:");
+    //     console.log(res);
+    //   });
+
+    let test123 = 1;
+    if (test123 === 1) {
+      return;
+    }
 
     // cleanup state variables
     performCleanup();
