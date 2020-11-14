@@ -11,6 +11,13 @@ async function getAllFiles(fetchOptions, pageSize) {
   return result;
 }
 
+async function getFileInfo(fetchOptions, fileId) {
+  let get_file_url = `${DRIVE_BASEURL}files/${fileId}?key=${API_KEY}&supportsAllDrives=true`;
+  const response = await fetch(get_file_url, fetchOptions);
+  const result = await response.json();
+  return result;
+}
+
 async function copyFile(authToken, fileId, name) {
   let copy_file_url = `${DRIVE_BASEURL}files/${fileId}/copy?key=${API_KEY}&supportsAllDrives=true&fields=*&alt=json`;
   const data = {
@@ -29,9 +36,11 @@ async function copyFile(authToken, fileId, name) {
   return result;
 }
 
-// remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
-function performCleanup() {
-  // TODO:
+// call 'copyFile()' for 'count' number of times. Generate name based on tokenized prefix and suffix
+async function copyMultipleFiles(authToken, fileId, count, prefix, suffix) {
+  if (count <= 0) return;
+
+  for (let i = 0; i < count; i++) {}
 }
 
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
@@ -76,6 +85,14 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     console.log(selectedIds); // Get the last one, sometimes previous pages' selections are also stored?
 
     const selectedFileId = selectedIds[selectedIds.length - 1];
+    const fileInfo = await getFileInfo(fetchOptions, selectedFileId);
+    console.log(fileInfo.name);
+
+    let test123 = 1;
+    if (test123 === 1) {
+      return;
+    }
+
     const copyResult = await copyFile(
       authToken,
       selectedFileId,
@@ -83,11 +100,6 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     );
     console.log("COPY RESULT:");
     console.log(copyResult);
-
-    let test123 = 1;
-    if (test123 === 1) {
-      return;
-    }
 
     const allFiles = await getAllFiles(fetchOptions, 50);
     console.log("FILES");
@@ -99,3 +111,8 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     sender: sender
   });
 });
+
+// remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
+function performCleanup() {
+  // TODO:
+}
