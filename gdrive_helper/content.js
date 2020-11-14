@@ -1,3 +1,5 @@
+const NUMBER_TOKEN = "{x}";
+
 const API_KEY = config.driveAPIKey; // read this from config file
 const DRIVE_BASEURL = "https://www.googleapis.com/drive/v3/";
 
@@ -19,7 +21,7 @@ async function getFileInfo(fetchOptions, fileId) {
 }
 
 async function copyFile(authToken, fileId, name) {
-  let copy_file_url = `${DRIVE_BASEURL}files/${fileId}/copy?key=${API_KEY}&supportsAllDrives=true&fields=*&alt=json`;
+  let copy_file_url = `${DRIVE_BASEURL}files/${fileId}/copy?key=${API_KEY}&supportsAllDrives=true&alt=json`;
   const data = {
     name: name
   };
@@ -37,10 +39,32 @@ async function copyFile(authToken, fileId, name) {
 }
 
 // call 'copyFile()' for 'count' number of times. Generate name based on tokenized prefix and suffix
-async function copyMultipleFiles(authToken, fileId, count, prefix, suffix) {
+async function copyMultipleFiles(
+  authToken,
+  fileId,
+  count,
+  name,
+  prefix,
+  suffix
+) {
   if (count <= 0) return;
+  const full_name_template = prefix + name + suffix;
+  const tokenInd = full_name_template.indexOf(NUMBER_TOKEN);
+  if (tokenInd === -1) return;
 
-  for (let i = 0; i < count; i++) {}
+  const before = full_name_template.slice(0, tokenInd);
+  const after = full_name_template.slice(
+    tokenInd + 3,
+    full_name_template.length
+  );
+
+  for (let i = 0; i < count; i++) {
+    const curr_name = before + i + after;
+    console.log(curr_name);
+
+    // call copy API
+    const copyResponse = await copyFile(authToken, fileId, curr_name);
+  }
 }
 
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
@@ -87,6 +111,17 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     const selectedFileId = selectedIds[selectedIds.length - 1];
     const fileInfo = await getFileInfo(fetchOptions, selectedFileId);
     console.log(fileInfo.name);
+
+    const multCopyResonse = copyMultipleFiles(
+      authToken,
+      selectedFileId,
+      2,
+      fileInfo.name,
+      "",
+      "_COPY_{x}_TEST"
+    );
+    console.log("MULT COPY:");
+    console.log(multCopyResonse);
 
     let test123 = 1;
     if (test123 === 1) {
