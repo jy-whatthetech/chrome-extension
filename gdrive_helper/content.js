@@ -21,7 +21,7 @@ async function getFileInfo(fetchOptions, fileId) {
 }
 
 async function copyFile(authToken, fileId, name) {
-  let copy_file_url = `${DRIVE_BASEURL}files/${fileId}/copy?key=${API_KEY}&supportsAllDrives=true&alt=json`;
+  let copy_file_url = `${DRIVE_BASEURL}files/${fileId}/copy?key=${API_KEY}&fields=id,mimeType,name,webViewLink&supportsAllDrives=true&alt=json`;
   const data = {
     name: name
   };
@@ -58,13 +58,20 @@ async function copyMultipleFiles(
     full_name_template.length
   );
 
-  for (let i = 0; i < count; i++) {
+  const multCopyResponse = [];
+
+  for (let i = 1; i <= count; i++) {
     const curr_name = before + i + after;
-    console.log(curr_name);
 
     // call copy API
     const copyResponse = await copyFile(authToken, fileId, curr_name);
+    console.log(curr_name + " COPIED");
+    console.log(copyResponse);
+
+    multCopyResponse.push(copyResponse);
   }
+
+  return multCopyResponse;
 }
 
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
@@ -112,7 +119,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     const fileInfo = await getFileInfo(fetchOptions, selectedFileId);
     console.log(fileInfo.name);
 
-    const multCopyResonse = copyMultipleFiles(
+    const multCopyResponse = await copyMultipleFiles(
       authToken,
       selectedFileId,
       2,
@@ -120,8 +127,9 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
       "",
       "_COPY_{x}_TEST"
     );
-    console.log("MULT COPY:");
-    console.log(multCopyResonse);
+    const shareLinks = getShareLinks(multCopyResponse);
+    console.log("Share Links");
+    console.log(shareLinks);
 
     let test123 = 1;
     if (test123 === 1) {
@@ -150,4 +158,12 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 // remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
 function performCleanup() {
   // TODO:
+}
+
+function getShareLinks(multCopyResponse) {
+  const res = [];
+  for (let copyResult of multCopyResponse) {
+    res.push(copyResult.webViewLink);
+  }
+  return res;
 }
