@@ -27,29 +27,15 @@
   <body>
     <div class="box">
       <h4 id="commentsLabel" class="slider-label">
-        Number of comments to display: 3
+        Prefix
       </h4>
       <div>
-        <input
-          id="commentsSlider"
-          type="range"
-          min="1"
-          max="10"
-          value="3"
-          step="1"
-        />
+        <input id="commentsSlider" type="text" />
       </div>
       <h4 id="ratingsLabel" class="slider-label">
-        Filter out videos below: 0%
+        Suffix
       </h4>
-      <input
-        id="ratingsSlider"
-        type="range"
-        min="0"
-        max="100"
-        value="0"
-        step="1"
-      />
+      <input id="ratingsSlider" type="text" />
       <script src="popup.js"></script>
     </div>
   </body>
