@@ -11,37 +11,22 @@
         justify-content: center;
         flex-direction: column;
       }
-      .slider-label {
-        text-align: center;
-        margin-bottom: 4px;
-      }
-      #commentsSlider {
-        width: 200px;
-      }
-      #ratingsSlider {
-        width: 200px;
-        margin-bottom: 5px;
-      }
     </style>
   </head>
   <body>
     <div class="box">
-      <h4 id="ratingsLabel" class="slider-label">
-        Number of Copies
-      </h4>
-      <input id="ratingsSlider" type="text" />
-      <h4 id="commentsLabel" class="slider-label">
-        Prefix
-      </h4>
-      <div>
-        <input id="commentsSlider" type="text" />
-      </div>
-      <h4 id="ratingsLabel" class="slider-label">
-        Suffix
-      </h4>
-      <input id="ratingsSlider" type="text" />
-      <script src="popup.js"></script>
+      <form>
+        <p style="display: flex;">
+          Number of Copies:<input id="copyCount" type="text" />
+        </p>
+        <p>
+          Prefix: <input style="display: inline;" id="namePrefix" type="text" />
+        </p>
+        <p>
+          Suffix: <input style="display: inline;" id="nameSuffix" type="text" />
+        </p>
+        <input type="submit" id="makeCopies" value="Make Copies" />
+      </form>
     </div>
-    <button type="button">Make Copies</button>
   </body>
 </html>
