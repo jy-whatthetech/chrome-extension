@@ -17,7 +17,11 @@
     <div class="box">
       <form>
         <p style="display: flex;">
-          Number of Copies:<input id="copyCount" type="text" />
+          Number of Copies:<input
+            style="margin-left: 3px; width: 100px"
+            id="copyCount"
+            type="text"
+          />
         </p>
         <p>
           Prefix: <input style="display: inline;" id="namePrefix" type="text" />
@@ -25,7 +29,9 @@
         <p>
           Suffix: <input style="display: inline;" id="nameSuffix" type="text" />
         </p>
-        <input type="submit" id="makeCopies" value="Make Copies" />
+        <p style="text-align: center;">
+          <input type="submit" id="makeCopies" value="Make Copies" />
+        </p>
       </form>
     </div>
   </body>

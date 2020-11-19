@@ -1,10 +1,15 @@
+const PREFIX_ID = "namePrefix";
+const SUFFIX_ID = "nameSuffix";
+const COPYCOUNT_ID = "copyCount";
+const SHARE_LINKS_KEY = "shareLinks";
+
 document.addEventListener("DOMContentLoaded", documentEvents, false);
 
 function documentEvents() {
-  chrome.storage.local.get(["commentsToDisplay", "ratingsToFilter"], function(
+  chrome.storage.local.get([PREFIX_ID, SUFFIX_ID, COPYCOUNT_ID], function(
     result
   ) {
-    if (result.commentsToDisplay) {
+    if (result[PREFIX_ID]) {
       const val = parseInt(result.commentsToDisplay);
       document.getElementById("commentsSlider").value = val;
       document.getElementById(
