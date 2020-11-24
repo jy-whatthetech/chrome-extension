@@ -1,3 +1,9 @@
+const PREFIX_ID = "namePrefix";
+const SUFFIX_ID = "nameSuffix";
+const COPYCOUNT_ID = "copyCount";
+const SHARE_LINKS_ID = "sharedLinks";
+const COPY_BUTTON_ID = "copyButton";
+
 const NUMBER_TOKEN = "{x}";
 
 const API_KEY = config.driveAPIKey; // read this from config file
@@ -157,8 +163,19 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
 // remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
 function performCleanup() {
-  // TODO:
+  // chrome.storage.local.get(["commentsToDisplay", "ratingsToFilter"], function(
+  //   result
+  // ) {
+  //   if (result.commentsToDisplay)
+  //     commentsToDisplay = parseInt(result.commentsToDisplay);
+  //   if (result.ratingsToFilter)
+  //     ratingsToFilter = parseInt(result.ratingsToFilter);
+  // });
 }
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  console.log("change recived!");
+});
+
 
 function getShareLinks(multCopyResponse) {
   const res = [];
