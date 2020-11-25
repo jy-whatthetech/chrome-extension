@@ -153,6 +153,9 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     const allFiles = await getAllFiles(fetchOptions, 50);
     console.log("FILES");
     console.log(allFiles);
+  } else {
+    console.log("OTHER MESSAGE RECEIVED");
+    console.log(msg);
   }
 
   sendResponse({
@@ -175,7 +178,6 @@ function performCleanup() {
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   console.log("change recived!");
 });
-
 
 function getShareLinks(multCopyResponse) {
   const res = [];

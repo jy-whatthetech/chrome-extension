@@ -50,7 +50,23 @@ function documentEvents() {
     );
   });
 
-  copyButton.addEventListener("click", (event) =>{
+  copyButton.addEventListener("click", event => {
+    chrome.tabs.query(
+      {
+        active: true,
+        lastFocusedWindow: true
+      },
+      function(tabs) {
+        var activeTab = tabs[0];
+        chrome.tabs.sendMessage(activeTab.id, {
+          copyCount: copyCountElement.value,
+          prefix: prefixElement.value,
+          suffix: suffixElement.value
+        });
+      }
+    );
+
+    // show text area with shared links
     sharedLinksElement.style.display = "block";
     event.preventDefault();
   });
