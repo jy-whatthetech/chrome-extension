@@ -56,7 +56,10 @@ async function copyMultipleFiles(
   if (count <= 0) return;
   const full_name_template = prefix + name + suffix;
   const tokenInd = full_name_template.indexOf(NUMBER_TOKEN);
-  if (tokenInd === -1) return;
+  if (tokenInd === -1) {
+    console.error("ERROR: NO TOKEN FOUND IN NAME");
+    return;
+  }
 
   const before = full_name_template.slice(0, tokenInd);
   const after = full_name_template.slice(
@@ -80,10 +83,20 @@ async function copyMultipleFiles(
   return multCopyResponse;
 }
 
+async function executeCopy(authToken, count, prefix, suffix) {}
+
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
     const fetchOptions = msg.fetchOptions;
     const authToken = msg.authToken;
+
+    console.log("MESSAGE RECEIVED");
+    console.log(msg);
+
+    let test123 = 1;
+    if (test123 === 1) {
+      return;
+    }
 
     // cleanup state variables
     performCleanup();
@@ -137,11 +150,6 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     console.log("Share Links");
     console.log(shareLinks);
 
-    let test123 = 1;
-    if (test123 === 1) {
-      return;
-    }
-
     const copyResult = await copyFile(
       authToken,
       selectedFileId,
@@ -153,9 +161,6 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     const allFiles = await getAllFiles(fetchOptions, 50);
     console.log("FILES");
     console.log(allFiles);
-  } else {
-    console.log("OTHER MESSAGE RECEIVED");
-    console.log(msg);
   }
 
   sendResponse({

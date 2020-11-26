@@ -51,23 +51,22 @@ function documentEvents() {
   });
 
   copyButton.addEventListener("click", event => {
-    chrome.tabs.query(
+    // send message to the background script, so it can get the auth token and pass that to content.js
+    chrome.runtime.sendMessage(
       {
-        active: true,
-        lastFocusedWindow: true
+        copyCount: copyCountElement.value,
+        prefix: prefixElement.value,
+        suffix: suffixElement.value
       },
-      function(tabs) {
-        var activeTab = tabs[0];
-        chrome.tabs.sendMessage(activeTab.id, {
-          copyCount: copyCountElement.value,
-          prefix: prefixElement.value,
-          suffix: suffixElement.value
-        });
+      function(response) {
+        // do nothing
       }
     );
 
+    // TODO: show progress text
+
     // show text area with shared links
-    sharedLinksElement.style.display = "block";
+    sharedLinksElement.style.display = "block"; //TODO: update as copying is completing
     event.preventDefault();
   });
 }
