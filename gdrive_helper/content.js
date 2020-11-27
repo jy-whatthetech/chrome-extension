@@ -90,13 +90,12 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     const fetchOptions = msg.fetchOptions;
     const authToken = msg.authToken;
 
+    const copyCount = msg.copyCount;
+    const prefix = msg.prefix;
+    const suffix = msg.suffix;
+
     console.log("MESSAGE RECEIVED");
     console.log(msg);
-
-    let test123 = 1;
-    if (test123 === 1) {
-      return;
-    }
 
     // cleanup state variables
     performCleanup();
@@ -141,26 +140,19 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     const multCopyResponse = await copyMultipleFiles(
       authToken,
       selectedFileId,
-      2,
+      copyCount,
       fileInfo.name,
-      "",
-      "_COPY_{x}_TEST"
+      prefix,
+      suffix
     );
     const shareLinks = getShareLinks(multCopyResponse);
     console.log("Share Links");
     console.log(shareLinks);
 
-    const copyResult = await copyFile(
-      authToken,
-      selectedFileId,
-      "COPY_BRBRBRBRRBR"
-    );
-    console.log("COPY RESULT:");
-    console.log(copyResult);
-
-    const allFiles = await getAllFiles(fetchOptions, 50);
-    console.log("FILES");
-    console.log(allFiles);
+    let test123 = 1;
+    if (test123 === 1) {
+      return;
+    }
   }
 
   sendResponse({
