@@ -34,6 +34,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             {
               text: "report_back",
               fetchOptions: fetchOptions,
+              authToken: token,
               ...msg
             },
             doStuffWithDom

@@ -83,8 +83,6 @@ async function copyMultipleFiles(
   return multCopyResponse;
 }
 
-async function executeCopy(authToken, count, prefix, suffix) {}
-
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
     const fetchOptions = msg.fetchOptions;
