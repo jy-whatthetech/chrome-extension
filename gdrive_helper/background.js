@@ -11,6 +11,9 @@ function doStuffWithDom(resp) {
 // This function will execute the copy sequence
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.copyCount) {
+    sendResponse({
+      msg: "Message passed on to content.js"
+    });
     chrome.tabs.query(
       {
         active: true,
@@ -39,9 +42,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             },
             doStuffWithDom
           );
-          sendResponse({
-            msg: "Message passed on to content.js"
-          });
         });
       }
     );

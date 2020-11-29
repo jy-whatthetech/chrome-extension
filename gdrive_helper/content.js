@@ -87,6 +87,8 @@ async function copyMultipleFiles(
 
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
+    sendResponse({ dom: document });
+
     const fetchOptions = msg.fetchOptions;
     const authToken = msg.authToken;
 
@@ -99,9 +101,6 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 
     // cleanup state variables
     performCleanup();
-
-    // return the dom back to backgrounds.js
-    sendResponse({ dom: document });
 
     let selectedIds = [];
     // filter out divs with data-tile-entry-id
