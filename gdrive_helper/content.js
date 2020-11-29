@@ -4,6 +4,8 @@ const COPYCOUNT_ID = "copyCount";
 const SHARE_LINKS_ID = "sharedLinks";
 const COPY_BUTTON_ID = "copyButton";
 
+const SHARE_LINKS_TEXT = "sharedLinksText";
+
 const NUMBER_TOKEN = "{x}";
 
 const API_KEY = config.driveAPIKey; // read this from config file
@@ -143,9 +145,11 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
       prefix,
       suffix
     );
-    const shareLinks = getShareLinks(multCopyResponse);
+    const shareLinks = getShareLinksText(multCopyResponse);
     console.log("Share Links");
     console.log(shareLinks);
+
+    chrome.storage.local.set({ [SHARE_LINKS_TEXT]: shareLinks }, function() {});
 
     let test123 = 1;
     if (test123 === 1) {
@@ -172,12 +176,22 @@ function performCleanup() {
 }
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   console.log("change recived!");
+  console.log(changes);
 });
 
 function getShareLinks(multCopyResponse) {
   const res = [];
   for (let copyResult of multCopyResponse) {
     res.push(copyResult.webViewLink);
+  }
+  return res;
+}
+function getShareLinksText(multCopyResponse) {
+  const arr = getShareLinks(multCopyResponse);
+  res = "";
+  for (let s of arr) {
+    res += s;
+    res += "\n";
   }
   return res;
 }

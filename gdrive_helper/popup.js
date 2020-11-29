@@ -4,6 +4,8 @@ const COPYCOUNT_ID = "copyCount";
 const SHARE_LINKS_ID = "sharedLinks";
 const COPY_BUTTON_ID = "copyButton";
 
+const SHARE_LINKS_TEXT = "sharedLinksText";
+
 document.addEventListener("DOMContentLoaded", documentEvents, false);
 
 function documentEvents() {
@@ -64,6 +66,9 @@ function documentEvents() {
     );
 
     // TODO: show progress text
+
+    // reset storage value for share links
+    chrome.storage.local.set({ [SHARE_LINKS_TEXT]: "" }, function() {});
 
     // show text area with shared links
     sharedLinksElement.style.display = "block"; //TODO: update as copying is completing
