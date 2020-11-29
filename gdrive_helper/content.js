@@ -150,11 +150,6 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     console.log(shareLinks);
 
     chrome.storage.local.set({ [SHARE_LINKS_TEXT]: shareLinks }, function() {});
-
-    let test123 = 1;
-    if (test123 === 1) {
-      return;
-    }
   }
 
   sendResponse({
@@ -174,10 +169,6 @@ function performCleanup() {
   //     ratingsToFilter = parseInt(result.ratingsToFilter);
   // });
 }
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-  console.log("change recived!");
-  console.log(changes);
-});
 
 function getShareLinks(multCopyResponse) {
   const res = [];
