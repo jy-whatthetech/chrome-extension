@@ -6,11 +6,18 @@ const COPY_BUTTON_ID = "copyButton";
 
 const SHARE_LINKS_TEXT = "sharedLinksText";
 const PROGRESS_MESSAGE_ID = "progressMessage";
+const ERROR_MESSAGE_TEXT = "errorMessageText";
 
 const NUMBER_TOKEN = "{x}";
 
 const API_KEY = config.driveAPIKey; // read this from config file
 const DRIVE_BASEURL = "https://www.googleapis.com/drive/v3/";
+
+function replaceAll(s, token, replace) {
+  const pieces = s.split(token);
+  const resultingString = pieces.join(replace);
+  return resultingString;
+}
 
 async function getAllFiles(fetchOptions, pageSize) {
   let get_files_url = `${DRIVE_BASEURL}files?key=${API_KEY}&corpora=user&includeItemsFromAllDrives=true&supportsAllDrives=true`;
@@ -60,15 +67,10 @@ async function copyMultipleFiles(
   const full_name_template = prefix + name + suffix;
   const tokenInd = full_name_template.indexOf(NUMBER_TOKEN);
   if (tokenInd === -1) {
+    // TODO: set error message in storage
     console.error("ERROR: NO TOKEN FOUND IN NAME");
     return;
   }
-
-  const before = full_name_template.slice(0, tokenInd);
-  const after = full_name_template.slice(
-    tokenInd + 3,
-    full_name_template.length
-  );
 
   const multCopyResponse = [];
 
@@ -81,7 +83,7 @@ async function copyMultipleFiles(
   );
 
   for (let i = 1; i <= count; i++) {
-    const curr_name = before + i + after;
+    const curr_name = replaceAll(full_name_template, NUMBER_TOKEN, i);
 
     // call copy API
     const copyResponse = await copyFile(authToken, fileId, curr_name);

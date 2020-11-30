@@ -5,6 +5,7 @@ const SHARE_LINKS_ID = "sharedLinks";
 const COPY_BUTTON_ID = "copyButton";
 const SHARE_LINKS_TEXT = "sharedLinksText";
 const PROGRESS_MESSAGE_ID = "progressMessage";
+const ERROR_MESSAGE_TEXT = "errorMessageText";
 
 document.addEventListener("DOMContentLoaded", documentEvents, false);
 
@@ -84,9 +85,9 @@ function documentEvents() {
       const newValue = changes[SHARE_LINKS_TEXT].newValue;
       sharedLinksTextArea.value = newValue;
     } else if (changes[PROGRESS_MESSAGE_ID]) {
-      const newValue = changes[PROGRESS_MESSAGE_ID].newValue;
+      const newValue = changes[PROGRESS_MESSAGE_ID].newValue.bold();
       progressMessageElement.style.display = "block";
-      progressMessageElement.textContent = newValue;
+      progressMessageElement.innerHTML = newValue;
     }
   });
 }
