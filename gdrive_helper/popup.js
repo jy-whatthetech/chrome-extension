@@ -61,6 +61,14 @@ function documentEvents() {
   });
 
   copyButton.addEventListener("click", event => {
+    // clear error message
+    chrome.storage.local.set(
+      {
+        [ERROR_MESSAGE_TEXT]: ""
+      },
+      function() {}
+    );
+
     // send message to the background script, so it can get the auth token and pass that to content.js
     chrome.runtime.sendMessage(
       {
@@ -87,7 +95,15 @@ function documentEvents() {
     } else if (changes[PROGRESS_MESSAGE_ID]) {
       const newValue = changes[PROGRESS_MESSAGE_ID].newValue.bold();
       progressMessageElement.style.display = "block";
+      progressMessageElement.style.color = "black";
       progressMessageElement.innerHTML = newValue;
+    } else if (changes[ERROR_MESSAGE_TEXT]) {
+      const newValue = changes[ERROR_MESSAGE_TEXT].newValue.bold();
+      if (newValue.length > 0) {
+        progressMessageElement.style.display = "block";
+        progressMessageElement.style.color = "red";
+        progressMessageElement.innerHTML = newValue;
+      }
     }
   });
 }

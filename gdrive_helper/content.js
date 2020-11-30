@@ -67,8 +67,14 @@ async function copyMultipleFiles(
   const full_name_template = prefix + name + suffix;
   const tokenInd = full_name_template.indexOf(NUMBER_TOKEN);
   if (tokenInd === -1) {
-    // TODO: set error message in storage
-    console.error("ERROR: NO TOKEN FOUND IN NAME");
+    let errorMsg =
+      "Please include the '{x}' token in either the prefix or the suffix.";
+    chrome.storage.local.set(
+      {
+        [ERROR_MESSAGE_TEXT]: errorMsg
+      },
+      function() {}
+    );
     return;
   }
 
@@ -92,7 +98,7 @@ async function copyMultipleFiles(
 
     let progressMessage = `Copying ${i + 1} of ${count} files...`;
     if (i == count) {
-      progressMessage = `Copy completed. ${name} was copied ${count} times.`;
+      progressMessage = `Copy completed. "${name}" was copied ${count} times.`;
     }
 
     chrome.storage.local.set(
@@ -143,7 +149,13 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     console.log("SELECTED ARRAY IS:");
     console.log(selectedIds); // Get the last one, sometimes previous pages' selections are also stored?
     if (selectedIds.length === 0) {
-      //TODO: set error messaage
+      let errorMsg = "Please select a file to copy.";
+      chrome.storage.local.set(
+        {
+          [ERROR_MESSAGE_TEXT]: errorMsg
+        },
+        function() {}
+      );
       return;
     }
 
@@ -160,6 +172,8 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
       prefix,
       suffix
     );
+    if (!multCopyResponse) return;
+
     const shareLinks = getShareLinksText(multCopyResponse);
     console.log("Share Links");
     console.log(shareLinks);
