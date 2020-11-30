@@ -5,6 +5,7 @@ const SHARE_LINKS_ID = "sharedLinks";
 const COPY_BUTTON_ID = "copyButton";
 
 const SHARE_LINKS_TEXT = "sharedLinksText";
+const PROGRESS_MESSAGE_ID = "progressMessage";
 
 const NUMBER_TOKEN = "{x}";
 
@@ -71,6 +72,14 @@ async function copyMultipleFiles(
 
   const multCopyResponse = [];
 
+  // reset progress text
+  chrome.storage.local.set(
+    {
+      [PROGRESS_MESSAGE_ID]: `Copying 1 of ${count} files...`
+    },
+    function() {}
+  );
+
   for (let i = 1; i <= count; i++) {
     const curr_name = before + i + after;
 
@@ -78,6 +87,18 @@ async function copyMultipleFiles(
     const copyResponse = await copyFile(authToken, fileId, curr_name);
     console.log(curr_name + " COPIED");
     console.log(copyResponse);
+
+    let progressMessage = `Copying ${i + 1} of ${count} files...`;
+    if (i == count) {
+      progressMessage = `Copy completed. ${name} was copied ${count} times.`;
+    }
+
+    chrome.storage.local.set(
+      {
+        [PROGRESS_MESSAGE_ID]: progressMessage
+      },
+      function() {}
+    );
 
     multCopyResponse.push(copyResponse);
   }

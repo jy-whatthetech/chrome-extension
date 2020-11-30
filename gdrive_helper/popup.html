@@ -9,7 +9,7 @@
       }
       .box {
         display: flex;
-        width: 250px;
+        width: 450px;
         align-items: center;
         justify-content: center;
         flex-direction: column;
@@ -44,12 +44,20 @@
         <p style="text-align: center;">
           <input type="submit" id="copyButton" value="Make Copies" />
         </p>
+
+        <p
+          id="progressMessage"
+          style="text-align: center; display: none; width: 100%;"
+        >
+          TEST 123
+        </p>
+
         <p id="sharedLinks" style="display: block; width: 100%;">
           Shared Links:
           <textarea
             id="sharedLinksText"
             style="width: 100%;"
-            rows="4"
+            rows="16"
           ></textarea>
         </p>
       </form>

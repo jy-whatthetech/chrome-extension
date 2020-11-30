@@ -4,6 +4,7 @@ const COPYCOUNT_ID = "copyCount";
 const SHARE_LINKS_ID = "sharedLinks";
 const COPY_BUTTON_ID = "copyButton";
 const SHARE_LINKS_TEXT = "sharedLinksText";
+const PROGRESS_MESSAGE_ID = "progressMessage";
 
 document.addEventListener("DOMContentLoaded", documentEvents, false);
 
@@ -14,6 +15,7 @@ function documentEvents() {
   const sharedLinksElement = document.getElementById(SHARE_LINKS_ID);
   const copyButton = document.getElementById(COPY_BUTTON_ID);
   const sharedLinksTextArea = document.getElementById(SHARE_LINKS_TEXT);
+  const progressMessageElement = document.getElementById(PROGRESS_MESSAGE_ID);
 
   chrome.storage.local.get(
     [PREFIX_ID, SUFFIX_ID, COPYCOUNT_ID, SHARE_LINKS_TEXT],
@@ -70,10 +72,8 @@ function documentEvents() {
       }
     );
 
-    // TODO: show progress text
-
     // show text area with shared links
-    sharedLinksElement.style.display = "block"; //TODO: update as copying is completing
+    sharedLinksElement.style.display = "block";
     event.preventDefault();
   });
 
@@ -83,6 +83,10 @@ function documentEvents() {
     if (changes[SHARE_LINKS_TEXT]) {
       const newValue = changes[SHARE_LINKS_TEXT].newValue;
       sharedLinksTextArea.value = newValue;
+    } else if (changes[PROGRESS_MESSAGE_ID]) {
+      const newValue = changes[PROGRESS_MESSAGE_ID].newValue;
+      progressMessageElement.style.display = "block";
+      progressMessageElement.textContent = newValue;
     }
   });
 }
