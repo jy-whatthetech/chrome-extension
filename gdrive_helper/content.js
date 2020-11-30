@@ -111,19 +111,7 @@ async function copyMultipleFiles(
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
   if (msg.text === "report_back") {
     sendResponse({ dom: document });
-
-    const fetchOptions = msg.fetchOptions;
-    const authToken = msg.authToken;
-
-    const copyCount = msg.copyCount;
-    const prefix = msg.prefix;
-    const suffix = msg.suffix;
-
-    console.log("MESSAGE RECEIVED");
-    console.log(msg);
-
-    // cleanup state variables
-    performCleanup();
+    const { fetchOptions, authToken, copyCount, prefix, suffix } = msg;
 
     let selectedIds = [];
     // filter out divs with data-tile-entry-id
@@ -152,12 +140,17 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
       }
     }
 
-    console.log("ARRAY IS:");
+    console.log("SELECTED ARRAY IS:");
     console.log(selectedIds); // Get the last one, sometimes previous pages' selections are also stored?
+    if (selectedIds.length === 0) {
+      //TODO: set error messaage
+      return;
+    }
 
     const selectedFileId = selectedIds[selectedIds.length - 1];
+
+    // get the file info for the name
     const fileInfo = await getFileInfo(fetchOptions, selectedFileId);
-    console.log(fileInfo.name);
 
     const multCopyResponse = await copyMultipleFiles(
       authToken,
@@ -179,18 +172,6 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
     sender: sender
   });
 });
-
-// remove all stray divs from document, clear all the variables, read commentsToDisplay and ratingsToFilter from storage
-function performCleanup() {
-  // chrome.storage.local.get(["commentsToDisplay", "ratingsToFilter"], function(
-  //   result
-  // ) {
-  //   if (result.commentsToDisplay)
-  //     commentsToDisplay = parseInt(result.commentsToDisplay);
-  //   if (result.ratingsToFilter)
-  //     ratingsToFilter = parseInt(result.ratingsToFilter);
-  // });
-}
 
 function getShareLinks(multCopyResponse) {
   const res = [];
