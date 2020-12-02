@@ -115,7 +115,13 @@ async function copyMultipleFiles(
 }
 
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
-  if (msg.text === "report_back") {
+  console.log("MESSAGE RECEIVED 121212121!!!!");
+  if (msg.getSelectedFile) {
+    sendResponse({
+      fileName: "TEST BRBRBR",
+      sender: sender
+    });
+  } else if (msg.text === "report_back") {
     sendResponse({ dom: document });
     const { fetchOptions, authToken, copyCount, prefix, suffix } = msg;
 

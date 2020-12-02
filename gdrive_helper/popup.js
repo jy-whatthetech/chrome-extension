@@ -5,6 +5,7 @@ const SHARE_LINKS_ID = "sharedLinks";
 const COPY_BUTTON_ID = "copyButton";
 const SHARE_LINKS_TEXT = "sharedLinksText";
 const PROGRESS_MESSAGE_ID = "progressMessage";
+const SELECTED_FILE_ID = "selectedFile";
 const ERROR_MESSAGE_TEXT = "errorMessageText";
 
 document.addEventListener("DOMContentLoaded", documentEvents, false);
@@ -17,6 +18,21 @@ function documentEvents() {
   const copyButton = document.getElementById(COPY_BUTTON_ID);
   const sharedLinksTextArea = document.getElementById(SHARE_LINKS_TEXT);
   const progressMessageElement = document.getElementById(PROGRESS_MESSAGE_ID);
+  const selectedFileElement = document.getElementById(SELECTED_FILE_ID);
+
+  chrome.runtime.sendMessage(
+    {
+      getSelectedFile: true
+    },
+    function(response) {
+      if (response.fileName) {
+        console.log("I received the following FILENAME:\n" + response.fileName);
+        const fileName = response.fileName.bold();
+        const msg = "File Selected: " + fileName;
+        selectedFileElement.innerHTML = msg;
+      }
+    }
+  );
 
   chrome.storage.local.get(
     [PREFIX_ID, SUFFIX_ID, COPYCOUNT_ID, SHARE_LINKS_TEXT],
