@@ -7,6 +7,7 @@ const COPY_BUTTON_ID = "copyButton";
 const SHARE_LINKS_TEXT = "sharedLinksText";
 const PROGRESS_MESSAGE_ID = "progressMessage";
 const ERROR_MESSAGE_TEXT = "errorMessageText";
+const SELECTED_FILE_ID = "selectedFile";
 
 const NUMBER_TOKEN = "{x}";
 
@@ -114,47 +115,70 @@ async function copyMultipleFiles(
   return multCopyResponse;
 }
 
+function getSelectedItems() {
+  const selectedObjArray = [];
+
+  const divs = document.getElementsByTagName("div");
+  for (let div of divs) {
+    let fileId = "";
+    if (div.hasAttribute("data-tile-entry-id")) {
+      // THIS IS FOR QUICK ACCESS TAB; TURN IT OFF FOR NOW
+      // const tabindex = div.getAttribute("tabindex");
+      // if (tabindex === "0") {
+      //   fileId = div.getAttribute("data-tile-entry-id");
+      // }
+    } else if (div.hasAttribute("data-id")) {
+      const childDivs = div.querySelectorAll("div");
+      for (let childDiv of childDivs) {
+        if (
+          childDiv.hasAttribute("aria-selected") &&
+          childDiv.getAttribute("aria-selected") === "true"
+        ) {
+          fileId = div.getAttribute("data-id");
+          break;
+        }
+      }
+    }
+
+    if (fileId.length > 0) {
+      const fileName = div
+        .querySelector("div[data-tooltip]")
+        .getAttribute("data-tooltip");
+      selectedObjArray.push({
+        fileId,
+        fileName,
+        div
+      });
+    }
+  }
+
+  return selectedObjArray;
+}
+
 chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
-  console.log("MESSAGE RECEIVED 121212121!!!!");
   if (msg.getSelectedFile) {
-    sendResponse({
-      fileName: "TEST BRBRBR",
-      sender: sender
-    });
+    sendResponse({});
+
+    const selectedFiles = getSelectedItems();
+    console.log("SELECTED FILES:");
+    console.log(selectedFiles);
+
+    if (selectedFiles.length > 0) {
+      chrome.storage.local.set(
+        {
+          [SELECTED_FILE_ID]: selectedFiles[selectedFiles.length - 1].fileName
+        },
+        function() {}
+      );
+    }
   } else if (msg.text === "report_back") {
     sendResponse({ dom: document });
     const { fetchOptions, authToken, copyCount, prefix, suffix } = msg;
 
-    let selectedIds = [];
-    // filter out divs with data-tile-entry-id
-    const divs = document.getElementsByTagName("div");
-    for (let div of divs) {
-      let fileId = "";
-      if (div.hasAttribute("data-tile-entry-id")) {
-        const tabindex = div.getAttribute("tabindex");
-        if (tabindex === "0") {
-          fileId = div.getAttribute("data-tile-entry-id");
-        }
-      } else if (div.hasAttribute("data-id")) {
-        const childDivs = div.querySelectorAll("div");
-        for (let childDiv of childDivs) {
-          if (
-            childDiv.hasAttribute("aria-selected") &&
-            childDiv.getAttribute("aria-selected") === "true"
-          ) {
-            fileId = div.getAttribute("data-id");
-            break;
-          }
-        }
-      }
-      if (fileId.length > 0) {
-        selectedIds.push(fileId);
-      }
-    }
+    const selectedFiles = getSelectedItems();
 
-    console.log("SELECTED ARRAY IS:");
-    console.log(selectedIds); // Get the last one, sometimes previous pages' selections are also stored?
-    if (selectedIds.length === 0) {
+    // Show error message if no file selected
+    if (selectedFiles.length === 0) {
       let errorMsg = "Please select a file to copy.";
       chrome.storage.local.set(
         {
@@ -165,7 +189,7 @@ chrome.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
       return;
     }
 
-    const selectedFileId = selectedIds[selectedIds.length - 1];
+    const selectedFileId = selectedFiles[selectedFiles.length - 1].fileId;
 
     // get the file info for the name
     const fileInfo = await getFileInfo(fetchOptions, selectedFileId);

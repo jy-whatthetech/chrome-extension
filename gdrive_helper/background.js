@@ -46,20 +46,23 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       }
     );
   } else if (msg.getSelectedFile) {
-    console.log("BACKGROUND MESSAGE FOR getSelectedFile RECEIVED");
+    sendResponse({
+      // do nothing
+    });
     chrome.tabs.query(
       {
         active: true,
         lastFocusedWindow: true
       },
       function(tabs) {
-        //TODO: send message to content.js
+        var tab = tabs[0];
+        // send message to content.js
         chrome.tabs.sendMessage(
           tab.id,
           {
             getSelectedFile: true
           },
-          doStuffWithDom
+          function() {}
         );
       }
     );

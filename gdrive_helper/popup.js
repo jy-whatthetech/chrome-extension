@@ -20,18 +20,17 @@ function documentEvents() {
   const progressMessageElement = document.getElementById(PROGRESS_MESSAGE_ID);
   const selectedFileElement = document.getElementById(SELECTED_FILE_ID);
 
+  chrome.storage.local.set(
+    {
+      [SELECTED_FILE_ID]: ""
+    },
+    function() {}
+  );
   chrome.runtime.sendMessage(
     {
       getSelectedFile: true
     },
-    function(response) {
-      if (response.fileName) {
-        console.log("I received the following FILENAME:\n" + response.fileName);
-        const fileName = response.fileName.bold();
-        const msg = "File Selected: " + fileName;
-        selectedFileElement.innerHTML = msg;
-      }
-    }
+    function(response) {}
   );
 
   chrome.storage.local.get(
@@ -103,7 +102,7 @@ function documentEvents() {
   });
 
   chrome.storage.onChanged.addListener(function(changes, namespace) {
-    console.log("change recived!");
+    console.log("chrome storage change recived!");
     console.log(changes);
     if (changes[SHARE_LINKS_TEXT]) {
       const newValue = changes[SHARE_LINKS_TEXT].newValue;
@@ -114,12 +113,21 @@ function documentEvents() {
       progressMessageElement.style.color = "black";
       progressMessageElement.innerHTML = newValue;
     } else if (changes[ERROR_MESSAGE_TEXT]) {
-      const newValue = changes[ERROR_MESSAGE_TEXT].newValue.bold();
+      let newValue = changes[ERROR_MESSAGE_TEXT].newValue;
       if (newValue.length > 0) {
+        newValue = newValue.bold();
         progressMessageElement.style.display = "block";
         progressMessageElement.style.color = "red";
         progressMessageElement.innerHTML = newValue;
       }
+    } else if (changes[SELECTED_FILE_ID]) {
+      const newValue = changes[SELECTED_FILE_ID].newValue;
+      let fileName = "(None)";
+      if (newValue.length > 0) {
+        fileName = newValue;
+      }
+      const msg = "File Selected: " + fileName.bold();
+      selectedFileElement.innerHTML = msg;
     }
   });
 }
